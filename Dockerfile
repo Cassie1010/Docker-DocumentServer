@@ -46,6 +46,7 @@ RUN echo "#!/bin/sh\nexit 0" > /usr/sbin/policy-rc.d && \
         supervisor \
         ttf-mscorefonts-installer \
         xvfb \
+        unzip \
         zlib1g && \
     if [  $(ls -l /usr/share/fonts/truetype/msttcorefonts | wc -l) -ne 61 ]; \
         then echo 'msttcorefonts failed to download'; exit 1; fi  && \
@@ -56,7 +57,7 @@ RUN echo "#!/bin/sh\nexit 0" > /usr/sbin/policy-rc.d && \
     service postgresql restart && \
     sudo -u postgres psql -c "CREATE DATABASE $ONLYOFFICE_VALUE;" && \
     sudo -u postgres psql -c "CREATE USER $ONLYOFFICE_VALUE WITH password '$ONLYOFFICE_VALUE';" && \
-    sudo -u postgres psql -c "GRANT ALL privileges ON DATABASE $ONLYOFFICE_VALUE TO $ONLYOFFICE_VALUE;" && \ 
+    sudo -u postgres psql -c "GRANT ALL privileges ON DATABASE $ONLYOFFICE_VALUE TO $ONLYOFFICE_VALUE;" && \
     service postgresql stop && \
     service redis-server stop && \
     service rabbitmq-server stop && \
@@ -71,7 +72,11 @@ EXPOSE 80 443
 
 ARG COMPANY_NAME=onlyoffice
 ARG PRODUCT_NAME=documentserver
-ARG PACKAGE_URL="http://download.onlyoffice.com/install/documentserver/linux/${COMPANY_NAME}-${PRODUCT_NAME}_amd64.deb"
+#ARG PACKAGE_URL="http://download.onlyoffice.com/install/documentserver/linux/${COMPANY_NAME}-${PRODUCT_NAME}_amd64.deb"
+#ARG PACKAGE_URL="http://download.onlyoffice.com/install/documentserver/linux/onlyoffice-documentserver_6.4.2_amd64.deb"
+ARG PACKAGE_URL="http://192.168.14.45:3000/onlyoffice-documentserver_6.4.2_amd64.deb"
+
+
 
 ENV COMPANY_NAME=$COMPANY_NAME \
     PRODUCT_NAME=$PRODUCT_NAME
@@ -85,7 +90,15 @@ RUN wget -q -P /tmp "$PACKAGE_URL" && \
     chmod 755 /app/ds/*.sh && \
     rm -f /tmp/$(basename "$PACKAGE_URL") && \
     rm -rf /var/log/$COMPANY_NAME && \
-    rm -rf /var/lib/apt/lists/*
+    rm -rf /var/lib/apt/lists/* \
+    rm -f /tmp/onlyoffice-documentserver_6.4.2_amd64.deb
+
+    # \
+    # rm -rf /usr/share/fonts/truetype/custom/* \
+    # rm -rf /var/www/onlyoffice/documentserver/core-fonts/*
+    # rm -rf /var/www/onlyoffice/documentserver/web-apps/* \
+
+ADD ./crack/var/www/onlyoffice /var/www/onlyoffice
 
 VOLUME /var/log/$COMPANY_NAME /var/lib/$COMPANY_NAME /var/www/$COMPANY_NAME/Data /var/lib/postgresql /var/lib/rabbitmq /var/lib/redis /usr/share/fonts/truetype/custom
 

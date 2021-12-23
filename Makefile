@@ -1,8 +1,8 @@
 COMPANY_NAME ?= ONLYOFFICE
 GIT_BRANCH ?= develop
 PRODUCT_NAME ?= DocumentServer
-PRODUCT_VERSION ?= 0.0.0
-BUILD_NUMBER ?= 0
+PRODUCT_VERSION ?= 6.4.2
+BUILD_NUMBER ?= 2
 ONLYOFFICE_VALUE ?= onlyoffice
 S3_BUCKET ?= repo-doc-onlyoffice-com
 RELEASE_BRANCH ?= unstable
@@ -19,7 +19,7 @@ UPDATE_LATEST := false
 
 ifneq (,$(findstring develop,$(GIT_BRANCH)))
 DOCKER_TAG += $(subst -,.,$(PACKAGE_VERSION))
-DOCKER_TAGS += latest
+DOCKER_TAGS += 6.4.2.1
 else ifneq (,$(findstring release,$(GIT_BRANCH)))
 DOCKER_TAG += $(subst -,.,$(PACKAGE_VERSION))
 else ifneq (,$(findstring hotfix,$(GIT_BRANCH)))
@@ -30,7 +30,7 @@ endif
 
 DOCKER_TAGS += $(DOCKER_TAG)
 
-DOCKER_REPO = $(COMPANY_NAME_LOW_ESCAPED)/4testing-$(PRODUCT_NAME_LOW)
+DOCKER_REPO = $(COMPANY_NAME_LOW_ESCAPED)/$(PRODUCT_NAME_LOW)
 
 COLON := __colon__
 DOCKER_TARGETS := $(foreach TAG,$(DOCKER_TAGS),$(DOCKER_REPO)$(COLON)$(TAG))
